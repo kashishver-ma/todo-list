@@ -25,7 +25,7 @@ const LoginPage = () => {
       await googleSignIn();
       router.push("/profile"); // Redirect to the profile page after Google sign-in
     } catch (err) {
-      setError("Failed to Log in with Google. Please try again.");
+      setError(error);
     }
   };
 
