@@ -1,5 +1,6 @@
 import React from "react";
 // import "./globals.css";
+import Image from "next/image";
 
 const Page = () => {
   return (
@@ -13,9 +14,9 @@ const Page = () => {
 
       <p className="mb-6 text-2xl font-bold text-black font-serif">
         Welcome to our To-Do List App! This application helps you keep track of
-        your tasks and manage your time efficiently. Whether you're planning
-        your daily schedule or organizing a big project, our app provides a
-        simple and effective way to stay on top of your tasks.
+        your tasks and manage your time efficiently. Whether you&apos;re
+        planning your daily schedule or organizing a big project, our app
+        provides a simple and effective way to stay on top of your tasks.
       </p>
       <br />
       <br />
@@ -51,7 +52,13 @@ const Page = () => {
           </ul>
         </div>
         <div>
-          <img className=" shadow-xl shadow-black" src="about.png" alt="" />
+          <Image
+            className="shadow-xl shadow-black"
+            src="/about.png"
+            alt="About image"
+            width={400}
+            height={300}
+          />
         </div>
       </div>
       <br />
