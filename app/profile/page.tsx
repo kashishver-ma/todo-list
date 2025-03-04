@@ -44,6 +44,28 @@ export default function Profile() {
   const [loading, setLoading] = useState<boolean>(true);
 
   // Previous useEffect hooks remain the same
+  useEffect(() => {
+    if (!user) {
+      router.push("./");
+    } else {
+      setLoading(false);
+    }
+  }, [user, router]);
+
+  useEffect(() => {
+    if (user) {
+      const q = query(collection(db, "items"), where("userId", "==", user.uid));
+      const unsubscribe = onSnapshot(q, (querySnapshot) => {
+        let itemsArr: TodoItem[] = [];
+        querySnapshot.forEach((doc) => {
+          itemsArr.push({ ...doc.data(), id: doc.id } as TodoItem);
+        });
+        setItems(itemsArr);
+      });
+
+      return () => unsubscribe();
+    }
+  }, [user]);
 
   const chooseOption = (status: string) => {
     setNewItem((prev) => ({ ...prev, status }));
@@ -95,125 +117,144 @@ export default function Profile() {
   }
 
   return (
-    <div className="p-4 md:p-10">
-      <div className="text-white">
-        <div className="bg-slate-400 p-4 rounded-lg">
-          <h2 className="text-3xl md:text-5xl font-bold mb-4 text-black font-serif text-center">
+    <div className="p-3 xs:p-4 sm:p-6 lg:p-10 max-w-7xl mx-auto">
+      <div className="text-white space-y-4">
+        {/* Task Input Section */}
+        <div className="bg-slate-400 p-3 xs:p-4 sm:p-6 rounded-lg">
+          <h2 className="text-xl xs:text-2xl sm:text-3xl lg:text-5xl font-bold mb-3 sm:mb-4 text-black font-serif text-center">
             Add Your Tasks
           </h2>
-          <div className="flex flex-col md:flex-row items-center gap-4 md:gap-10 mb-6 justify-center">
+
+          <div className="flex flex-col gap-2 xs:gap-3 sm:gap-4">
+            {/* Task Name Input */}
             <input
               value={newItem.name}
               onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
-              className="bg-white p-3 text-black rounded-lg w-full md:w-[580px]"
+              className="bg-white p-2 xs:p-3 text-black rounded-lg w-full text-sm xs:text-base"
               placeholder="Enter Task"
               type="text"
             />
+
+            {/* Time Input */}
             <input
               value={newItem.time}
               onChange={(e) => setNewItem({ ...newItem, time: e.target.value })}
-              className="bg-white p-3 text-black rounded-lg w-full md:w-96"
+              className="bg-white p-2 xs:p-3 text-black rounded-lg w-full text-sm xs:text-base"
               placeholder="Select date and time"
               type="datetime-local"
             />
-            <div className="flex flex-wrap gap-2 md:gap-3 justify-center">
+
+            {/* Status Buttons */}
+            <div className="flex flex-wrap justify-center gap-2 xs:gap-3">
+              {["Urgent", "Important", "Ignorable"].map((status) => (
+                <button
+                  key={status}
+                  onClick={() => chooseOption(status)}
+                  className={`w-full xs:w-auto px-2 xs:px-3 py-1 xs:py-2 rounded-lg text-xs xs:text-sm transition ${
+                    selectedStatus === status
+                      ? "bg-gray-600 text-gray-400"
+                      : status === "Urgent"
+                      ? "bg-red-600 text-white hover:bg-red-500"
+                      : status === "Important"
+                      ? "bg-yellow-400 text-white hover:bg-yellow-300"
+                      : "bg-sky-600 text-white hover:bg-sky-500"
+                  }`}
+                >
+                  {status}
+                </button>
+              ))}
+
+              {/* Add Task Button */}
               <button
-                onClick={() => chooseOption("Urgent")}
-                className={`p-2 md:p-3 rounded-lg hover:shadow-xl hover:shadow-gray-500 w-full md:w-28 transition ${
-                  selectedStatus === "Urgent"
-                    ? "bg-gray-600 text-gray-400"
-                    : "bg-red-600 text-white hover:bg-red-500"
-                }`}
-              >
-                Urgent
-              </button>
-              <button
-                onClick={() => chooseOption("Important")}
-                className={`p-2 md:p-3 rounded-lg hover:shadow-xl hover:shadow-gray-500 w-full md:w-28 transition ${
-                  selectedStatus === "Important"
-                    ? "bg-gray-600 text-gray-400"
-                    : "bg-yellow-400 text-white hover:bg-yellow-300"
-                }`}
-              >
-                Important
-              </button>
-              <button
-                onClick={() => chooseOption("Ignorable")}
-                className={`p-2 md:p-3 rounded-lg w-full md:w-28 hover:shadow-xl hover:shadow-gray-500 transition ${
-                  selectedStatus === "Ignorable"
-                    ? "bg-gray-600 text-gray-400"
-                    : "bg-sky-600 text-white hover:bg-sky-500"
-                }`}
-              >
-                Ignorable
-              </button>
-              <button
-                type="submit"
                 onClick={addItem}
-                className="bg-slate-600 text-white hover:bg-slate-700 transition w-full md:w-28 p-2 md:p-3 rounded-lg"
+                className="w-full xs:w-auto bg-slate-600 text-white px-2 xs:px-3 py-1 xs:py-2 rounded-lg text-xs xs:text-sm hover:bg-slate-700"
               >
-                Add
+                Add Task
               </button>
             </div>
           </div>
         </div>
 
-        <div className="bg-slate-400 mt-6 p-4 rounded-lg">
-          <div>
-            <div className="flex justify-evenly text-xl md:text-2xl font-bold font-serif">
-              <h2>Task</h2> | <h2>Time</h2> | <h3>Status</h3>
+        {/* Task List Section */}
+        <div className="bg-slate-400 p-3 xs:p-4 sm:p-6 rounded-lg">
+          <div className="hidden sm:flex justify-evenly text-base sm:text-xl lg:text-2xl font-bold font-serif mb-4">
+            <h2>Task</h2> | <h2>Time</h2> | <h3>Status</h3>
+          </div>
+
+          {items.length === 0 ? (
+            <div className="text-center p-3 text-black text-base sm:text-xl">
+              No tasks yet. Add a task to get started!
             </div>
-            {items.length === 0 ? (
-              <div className="text-center mt-8 p-4 text-black text-xl">
-                No tasks yet. Add a task to get started!
-              </div>
-            ) : (
-              items.map((item, index) => {
-                let statusClass = "";
-                switch (item.status) {
-                  case "Urgent":
-                    statusClass = "bg-red-600 text-white";
-                    break;
-                  case "Important":
-                    statusClass = "bg-yellow-400 text-white";
-                    break;
-                  case "Ignorable":
-                    statusClass = "bg-sky-500 text-white";
-                    break;
-                  default:
-                    statusClass = "bg-gray-500 text-white";
-                    break;
-                }
-                return (
-                  <div
-                    key={index}
-                    className="mt-8 p-3 text-white bg-slate-600 flex flex-col md:flex-row justify-between items-center rounded-lg font-sans"
-                  >
-                    <div className="flex flex-col md:flex-row justify-between w-full items-center text-center md:text-left">
-                      <span className="capitalize text-xl md:text-3xl mb-2 md:mb-0 md:w-2/3">
+          ) : (
+            items.map((item) => {
+              const statusClasses = {
+                Urgent: "bg-red-600 text-white",
+                Important: "bg-yellow-400 text-white",
+                Ignorable: "bg-sky-500 text-white",
+              };
+
+              return (
+                <div
+                  key={item.id}
+                  className="bg-slate-600 rounded-lg p-3 xs:p-4 mb-2 xs:mb-3"
+                >
+                  {/* Mobile View */}
+                  <div className="sm:hidden">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-base font-bold capitalize">
                         {item.name}
                       </span>
-
-                      <span className="text-base md:text-2xl mb-2 md:mb-0 font-bold text-black hover:scale-110 md:w-1/3 md:text-center">
-                        {formatDateTime(item.time)}
-                      </span>
                       <span
-                        className={`p-2 animate-custom-pulse rounded-lg h-10 mb-2 md:mb-0 w-full md:w-1/3 text-center justify-center ${statusClass} text-sm md:text-base`}
+                        className={`px-2 py-1 rounded text-xs ${
+                          statusClasses[
+                            item.status as keyof typeof statusClasses
+                          ] || "bg-gray-500"
+                        }`}
                       >
                         {item.status}
                       </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-300">
+                        {formatDateTime(item.time)}
+                      </span>
                       <button
                         onClick={() => deleteItem(item.id)}
-                        className="p-2 text-white rounded-lg bg-lime-500 hover:bg-red-500 hover:rounded-lg hover:scale-110 transition hover:cursor-pointer"
+                        className="bg-lime-500 text-white px-2 py-1 rounded text-xs hover:bg-red-500"
                       >
-                        Delete/Complete
+                        Delete
                       </button>
                     </div>
                   </div>
-                );
-              })
-            )}
-          </div>
+
+                  {/* Desktop View */}
+                  <div className="hidden sm:flex justify-between items-center">
+                    <span className="w-1/3 text-base sm:text-xl lg:text-2xl capitalize">
+                      {item.name}
+                    </span>
+                    <span className="w-1/3 text-center text-sm sm:text-base lg:text-xl text-black font-bold">
+                      {formatDateTime(item.time)}
+                    </span>
+                    <span
+                      className={`w-1/3 text-center px-2 py-1 rounded text-xs sm:text-sm ${
+                        statusClasses[
+                          item.status as keyof typeof statusClasses
+                        ] || "bg-gray-500"
+                      }`}
+                    >
+                      {item.status}
+                    </span>
+                    <button
+                      onClick={() => deleteItem(item.id)}
+                      className="bg-lime-500 text-white px-3 py-1 rounded text-xs sm:text-sm hover:bg-red-500"
+                    >
+                      Delete/Complete
+                    </button>
+                  </div>
+                </div>
+              );
+            })
+          )}
         </div>
       </div>
     </div>
