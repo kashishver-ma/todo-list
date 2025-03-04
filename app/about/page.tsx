@@ -1,5 +1,4 @@
 import React from "react";
-// import "./globals.css";
 import Image from "next/image";
 
 const Page = () => {
@@ -43,7 +42,7 @@ const Page = () => {
             <li>
               {" "}
               <strong className="text-purple-900 font-bold">Mark</strong> tasks
-              status as urgent,important,ignaorable.
+              status as urgent, important, ignorable.
             </li>
             <li>
               <strong className="text-purple-900 font-bold">Organize</strong>{" "}

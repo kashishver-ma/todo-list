@@ -1,6 +1,7 @@
 "use client";
-import todo from "@/public/todo.png";
 
+import Image from "next/image";
+import todo from "@/public/todo.png";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { UserAuth } from "../context/AuthContext";
@@ -59,7 +60,7 @@ const Navbar = () => {
       </div>
 
       <div className="font-bold text-4xl flex justify-self-center animate-bounce">
-        TO-DO <img width={55} height={20} src="todo.png" alt="not avail" />
+        TO-DO <Image width={55} height={20} src={todo} alt="todo icon" />
       </div>
 
       <div className="flex">
