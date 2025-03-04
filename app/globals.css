@@ -4,8 +4,8 @@
 
 :root {
   --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+  --background-start-rgb: 0, 0, 0;
+  --background-end-rgb: 0, 0, 0;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -31,3 +31,63 @@ body {
     text-wrap: balance;
   }
 }
+.status-urgent {
+  background-color: #f56565; /* red-600 */
+  color: #ffffff;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+}
+
+.status-important {
+  background-color: #facc15; /* yellow-400 */
+  color: #000000;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+}
+
+.status-ignorable {
+  background-color: #0ea5e9; /* sky-600 */
+  color: #ffffff;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+}
+
+@keyframes customPulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.animate-custom-pulse {
+  animation: customPulse 0.4s infinite; /* Adjust duration here */
+}
+
+/* Add this to your global CSS file or in a <style> tag in your component */
+.spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1); /* Light grey */
+  border-top: 4px solid #3498db; /* Blue color */
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* ::selection {
+  background-color: #000000;
+  color: red;
+} */
